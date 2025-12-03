@@ -62,24 +62,32 @@ export function DistribuicaoPublico({ data, calculated, updateField }: Props) {
             <thead>
               <tr>
                 <th>Público</th>
-                <th className="text-right">Investimento</th>
-                <th className="text-right">Faturamento</th>
+                <th className="text-right">Invest. Mensal</th>
+                <th className="text-right">Invest. Ciclo</th>
+                <th className="text-right">Fat. Mensal</th>
+                <th className="text-right">Fat. Ciclo</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td className="font-medium">Menina</td>
+                <td className="text-right font-mono">{formatCurrency(calculated.investimento_menina / 6)}</td>
                 <td className="text-right font-mono">{formatCurrency(calculated.investimento_menina)}</td>
+                <td className="text-right font-mono">{formatCurrency(calculated.faturamento_menina / 6)}</td>
                 <td className="text-right font-mono">{formatCurrency(calculated.faturamento_menina)}</td>
               </tr>
               <tr>
                 <td className="font-medium">Menino</td>
+                <td className="text-right font-mono">{formatCurrency(calculated.investimento_menino / 6)}</td>
                 <td className="text-right font-mono">{formatCurrency(calculated.investimento_menino)}</td>
+                <td className="text-right font-mono">{formatCurrency(calculated.faturamento_menino / 6)}</td>
                 <td className="text-right font-mono">{formatCurrency(calculated.faturamento_menino)}</td>
               </tr>
               <tr>
                 <td className="font-medium">Bebê</td>
+                <td className="text-right font-mono">{formatCurrency(calculated.investimento_bebe / 6)}</td>
                 <td className="text-right font-mono">{formatCurrency(calculated.investimento_bebe)}</td>
+                <td className="text-right font-mono">{formatCurrency(calculated.faturamento_bebe / 6)}</td>
                 <td className="text-right font-mono">{formatCurrency(calculated.faturamento_bebe)}</td>
               </tr>
             </tbody>
