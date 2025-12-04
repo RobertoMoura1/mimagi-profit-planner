@@ -11,17 +11,11 @@ import { ResultadoLucro } from '@/components/dashboard/sections/ResultadoLucro';
 import { PontoEquilibrio } from '@/components/dashboard/sections/PontoEquilibrio';
 import { AlertasAutomaticos } from '@/components/dashboard/sections/AlertasAutomaticos';
 import { Simulacao } from '@/components/dashboard/sections/Simulacao';
-import { exportToPDF } from '@/utils/exportPDF';
 import { Loader2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const Index = () => {
   const { data, calculated, alerts, loading, saving, updateField, calculateSimulation } = usePlanejamento();
-
-  const handleExportPDF = () => {
-    const simulation = calculateSimulation(calculated.faturamento_mensal * 1.5);
-    exportToPDF(data, calculated, simulation);
-  };
 
   if (loading) {
     return (
@@ -36,7 +30,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <DashboardHeader saving={saving} onExportPDF={handleExportPDF} />
+      <DashboardHeader saving={saving} />
       
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="variaveis" className="w-full">
