@@ -84,6 +84,48 @@ export interface PlanejamentoFinanceiro {
   custo_sistema: number;
   custo_marketing: number;
   custo_outros: number;
+  
+  // Seção 13: Planejamento por Canais de Venda
+  canal_loja_fisica_perc: number;
+  canal_instagram_ads_perc: number;
+  canal_instagram_organico_perc: number;
+  canal_whatsapp_perc: number;
+  canal_shopee_perc: number;
+  canal_indicacoes_perc: number;
+  canal_eventos_perc: number;
+  
+  // Investimentos por canal
+  invest_instagram_ads: number;
+  invest_promocoes: number;
+  invest_whatsapp: number;
+  invest_shopee: number;
+  invest_influenciadores: number;
+  invest_outros: number;
+  
+  // Ticket médio por canal
+  ticket_loja_fisica: number;
+  ticket_instagram_ads: number;
+  ticket_whatsapp: number;
+  ticket_shopee: number;
+  
+  // CPV por canal
+  cpv_instagram_ads: number;
+  cpv_whatsapp: number;
+  cpv_shopee: number;
+  
+  // Taxa de conversão por canal
+  conv_instagram_ads: number;
+  conv_whatsapp: number;
+  conv_shopee: number;
+  
+  // Conteúdos semanais
+  conteudo_reels_ads: number;
+  conteudo_criativos_trafego: number;
+  conteudo_stories_dia: number;
+  conteudo_posts_semana: number;
+  conteudo_acoes_loja: number;
+  conteudo_whatsapp: number;
+  conteudo_shopee: number;
 }
 
 export interface CalculatedValues {
@@ -203,4 +245,36 @@ export const defaultPlanejamento: PlanejamentoFinanceiro = {
   custo_sistema: 200,
   custo_marketing: 1000,
   custo_outros: 500,
+  
+  // Seção 13: Canais de Venda
+  canal_loja_fisica_perc: 30,
+  canal_instagram_ads_perc: 25,
+  canal_instagram_organico_perc: 15,
+  canal_whatsapp_perc: 10,
+  canal_shopee_perc: 10,
+  canal_indicacoes_perc: 5,
+  canal_eventos_perc: 5,
+  invest_instagram_ads: 2000,
+  invest_promocoes: 500,
+  invest_whatsapp: 300,
+  invest_shopee: 500,
+  invest_influenciadores: 1000,
+  invest_outros: 200,
+  ticket_loja_fisica: 180,
+  ticket_instagram_ads: 150,
+  ticket_whatsapp: 140,
+  ticket_shopee: 120,
+  cpv_instagram_ads: 25,
+  cpv_whatsapp: 10,
+  cpv_shopee: 15,
+  conv_instagram_ads: 2.5,
+  conv_whatsapp: 15,
+  conv_shopee: 3,
+  conteudo_reels_ads: 10,
+  conteudo_criativos_trafego: 5,
+  conteudo_stories_dia: 15,
+  conteudo_posts_semana: 5,
+  conteudo_acoes_loja: 3,
+  conteudo_whatsapp: 2,
+  conteudo_shopee: 5,
 };

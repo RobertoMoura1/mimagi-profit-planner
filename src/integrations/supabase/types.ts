@@ -16,6 +16,26 @@ export type Database = {
     Tables: {
       planejamentos_financeiros: {
         Row: {
+          canal_eventos_perc: number | null
+          canal_indicacoes_perc: number | null
+          canal_instagram_ads_perc: number | null
+          canal_instagram_organico_perc: number | null
+          canal_loja_fisica_perc: number | null
+          canal_shopee_perc: number | null
+          canal_whatsapp_perc: number | null
+          conteudo_acoes_loja: number | null
+          conteudo_criativos_trafego: number | null
+          conteudo_posts_semana: number | null
+          conteudo_reels_ads: number | null
+          conteudo_shopee: number | null
+          conteudo_stories_dia: number | null
+          conteudo_whatsapp: number | null
+          conv_instagram_ads: number | null
+          conv_shopee: number | null
+          conv_whatsapp: number | null
+          cpv_instagram_ads: number | null
+          cpv_shopee: number | null
+          cpv_whatsapp: number | null
           created_at: string
           custo_agua_luz: number | null
           custo_aluguel: number | null
@@ -28,6 +48,12 @@ export type Database = {
           custo_salarios: number | null
           custo_sistema: number | null
           id: string
+          invest_influenciadores: number | null
+          invest_instagram_ads: number | null
+          invest_outros: number | null
+          invest_promocoes: number | null
+          invest_shopee: number | null
+          invest_whatsapp: number | null
           investimento_ciclo: number | null
           marca_bebe_1_nome: string | null
           marca_bebe_1_perc: number | null
@@ -63,6 +89,10 @@ export type Database = {
           perc_menino: number | null
           perc_roupas: number | null
           perc_sapatos: number | null
+          ticket_instagram_ads: number | null
+          ticket_loja_fisica: number | null
+          ticket_shopee: number | null
+          ticket_whatsapp: number | null
           tipo_bebe_basicos: number | null
           tipo_bebe_casual: number | null
           tipo_bebe_conjuntos: number | null
@@ -79,6 +109,26 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          canal_eventos_perc?: number | null
+          canal_indicacoes_perc?: number | null
+          canal_instagram_ads_perc?: number | null
+          canal_instagram_organico_perc?: number | null
+          canal_loja_fisica_perc?: number | null
+          canal_shopee_perc?: number | null
+          canal_whatsapp_perc?: number | null
+          conteudo_acoes_loja?: number | null
+          conteudo_criativos_trafego?: number | null
+          conteudo_posts_semana?: number | null
+          conteudo_reels_ads?: number | null
+          conteudo_shopee?: number | null
+          conteudo_stories_dia?: number | null
+          conteudo_whatsapp?: number | null
+          conv_instagram_ads?: number | null
+          conv_shopee?: number | null
+          conv_whatsapp?: number | null
+          cpv_instagram_ads?: number | null
+          cpv_shopee?: number | null
+          cpv_whatsapp?: number | null
           created_at?: string
           custo_agua_luz?: number | null
           custo_aluguel?: number | null
@@ -91,6 +141,12 @@ export type Database = {
           custo_salarios?: number | null
           custo_sistema?: number | null
           id?: string
+          invest_influenciadores?: number | null
+          invest_instagram_ads?: number | null
+          invest_outros?: number | null
+          invest_promocoes?: number | null
+          invest_shopee?: number | null
+          invest_whatsapp?: number | null
           investimento_ciclo?: number | null
           marca_bebe_1_nome?: string | null
           marca_bebe_1_perc?: number | null
@@ -126,6 +182,10 @@ export type Database = {
           perc_menino?: number | null
           perc_roupas?: number | null
           perc_sapatos?: number | null
+          ticket_instagram_ads?: number | null
+          ticket_loja_fisica?: number | null
+          ticket_shopee?: number | null
+          ticket_whatsapp?: number | null
           tipo_bebe_basicos?: number | null
           tipo_bebe_casual?: number | null
           tipo_bebe_conjuntos?: number | null
@@ -142,6 +202,26 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          canal_eventos_perc?: number | null
+          canal_indicacoes_perc?: number | null
+          canal_instagram_ads_perc?: number | null
+          canal_instagram_organico_perc?: number | null
+          canal_loja_fisica_perc?: number | null
+          canal_shopee_perc?: number | null
+          canal_whatsapp_perc?: number | null
+          conteudo_acoes_loja?: number | null
+          conteudo_criativos_trafego?: number | null
+          conteudo_posts_semana?: number | null
+          conteudo_reels_ads?: number | null
+          conteudo_shopee?: number | null
+          conteudo_stories_dia?: number | null
+          conteudo_whatsapp?: number | null
+          conv_instagram_ads?: number | null
+          conv_shopee?: number | null
+          conv_whatsapp?: number | null
+          cpv_instagram_ads?: number | null
+          cpv_shopee?: number | null
+          cpv_whatsapp?: number | null
           created_at?: string
           custo_agua_luz?: number | null
           custo_aluguel?: number | null
@@ -154,6 +234,12 @@ export type Database = {
           custo_salarios?: number | null
           custo_sistema?: number | null
           id?: string
+          invest_influenciadores?: number | null
+          invest_instagram_ads?: number | null
+          invest_outros?: number | null
+          invest_promocoes?: number | null
+          invest_shopee?: number | null
+          invest_whatsapp?: number | null
           investimento_ciclo?: number | null
           marca_bebe_1_nome?: string | null
           marca_bebe_1_perc?: number | null
@@ -189,6 +275,10 @@ export type Database = {
           perc_menino?: number | null
           perc_roupas?: number | null
           perc_sapatos?: number | null
+          ticket_instagram_ads?: number | null
+          ticket_loja_fisica?: number | null
+          ticket_shopee?: number | null
+          ticket_whatsapp?: number | null
           tipo_bebe_basicos?: number | null
           tipo_bebe_casual?: number | null
           tipo_bebe_conjuntos?: number | null

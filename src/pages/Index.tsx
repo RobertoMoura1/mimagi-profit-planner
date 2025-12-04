@@ -11,6 +11,7 @@ import { ResultadoLucro } from '@/components/dashboard/sections/ResultadoLucro';
 import { PontoEquilibrio } from '@/components/dashboard/sections/PontoEquilibrio';
 import { AlertasAutomaticos } from '@/components/dashboard/sections/AlertasAutomaticos';
 import { Simulacao } from '@/components/dashboard/sections/Simulacao';
+import { PlanejamentoCanais } from '@/components/dashboard/sections/PlanejamentoCanais';
 import { Loader2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -35,23 +36,26 @@ const Index = () => {
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="variaveis" className="w-full">
           <TabsList className="w-full flex flex-wrap h-auto gap-1 bg-muted/50 p-2 mb-6">
-            <TabsTrigger value="variaveis" className="flex-1 min-w-[120px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
+            <TabsTrigger value="variaveis" className="flex-1 min-w-[100px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
               Variáveis
             </TabsTrigger>
-            <TabsTrigger value="distribuicao" className="flex-1 min-w-[120px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
+            <TabsTrigger value="distribuicao" className="flex-1 min-w-[100px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
               Distribuição
             </TabsTrigger>
-            <TabsTrigger value="produtos" className="flex-1 min-w-[120px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
+            <TabsTrigger value="produtos" className="flex-1 min-w-[100px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
               Produtos
             </TabsTrigger>
-            <TabsTrigger value="custos" className="flex-1 min-w-[120px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
+            <TabsTrigger value="custos" className="flex-1 min-w-[100px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
               Custos
             </TabsTrigger>
-            <TabsTrigger value="resultados" className="flex-1 min-w-[120px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
+            <TabsTrigger value="resultados" className="flex-1 min-w-[100px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
               Resultados
             </TabsTrigger>
-            <TabsTrigger value="simulacao" className="flex-1 min-w-[120px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
+            <TabsTrigger value="simulacao" className="flex-1 min-w-[100px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
               Simulação
+            </TabsTrigger>
+            <TabsTrigger value="canais" className="flex-1 min-w-[100px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
+              Canais
             </TabsTrigger>
           </TabsList>
 
@@ -82,6 +86,10 @@ const Index = () => {
 
           <TabsContent value="simulacao" className="space-y-6">
             <Simulacao calculateSimulation={calculateSimulation} currentFaturamento={calculated.faturamento_mensal} />
+          </TabsContent>
+
+          <TabsContent value="canais" className="space-y-6">
+            <PlanejamentoCanais data={data} calculated={calculated} updateField={updateField} />
           </TabsContent>
         </Tabs>
         
