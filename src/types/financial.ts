@@ -8,6 +8,7 @@ export interface CanalVenda {
   cpv: number;
   conv: number;
   hasInvest: boolean;
+  roas_esperado: number;
 }
 
 export interface PlanejamentoFinanceiro {
@@ -263,13 +264,13 @@ export const defaultPlanejamento: PlanejamentoFinanceiro = {
   
   // Seção 13: Canais de Venda Dinâmicos
   canais_venda: [
-    { id: '1', nome: 'Loja Física', perc: 30, ticket: 180, invest: 0, cpv: 0, conv: 0, hasInvest: false },
-    { id: '2', nome: 'Instagram Ads', perc: 25, ticket: 150, invest: 2000, cpv: 25, conv: 2.5, hasInvest: true },
-    { id: '3', nome: 'Instagram Orgânico', perc: 15, ticket: 150, invest: 0, cpv: 0, conv: 0, hasInvest: false },
-    { id: '4', nome: 'WhatsApp', perc: 10, ticket: 140, invest: 300, cpv: 10, conv: 15, hasInvest: true },
-    { id: '5', nome: 'Shopee', perc: 10, ticket: 120, invest: 500, cpv: 15, conv: 3, hasInvest: true },
-    { id: '6', nome: 'Indicações/Recorrência', perc: 5, ticket: 180, invest: 0, cpv: 0, conv: 0, hasInvest: false },
-    { id: '7', nome: 'Eventos/Ações', perc: 5, ticket: 180, invest: 0, cpv: 0, conv: 0, hasInvest: false },
+    { id: '1', nome: 'Loja Física', perc: 30, ticket: 180, invest: 0, cpv: 0, conv: 0, hasInvest: false, roas_esperado: 0 },
+    { id: '2', nome: 'Instagram Ads', perc: 25, ticket: 150, invest: 2000, cpv: 25, conv: 2.5, hasInvest: true, roas_esperado: 5 },
+    { id: '3', nome: 'Instagram Orgânico', perc: 15, ticket: 150, invest: 0, cpv: 0, conv: 0, hasInvest: false, roas_esperado: 0 },
+    { id: '4', nome: 'WhatsApp', perc: 10, ticket: 140, invest: 300, cpv: 10, conv: 15, hasInvest: true, roas_esperado: 8 },
+    { id: '5', nome: 'Shopee', perc: 10, ticket: 120, invest: 500, cpv: 15, conv: 3, hasInvest: true, roas_esperado: 4 },
+    { id: '6', nome: 'Indicações/Recorrência', perc: 5, ticket: 180, invest: 0, cpv: 0, conv: 0, hasInvest: false, roas_esperado: 0 },
+    { id: '7', nome: 'Eventos/Ações', perc: 5, ticket: 180, invest: 0, cpv: 0, conv: 0, hasInvest: false, roas_esperado: 0 },
   ],
   
   // Campos legados para compatibilidade

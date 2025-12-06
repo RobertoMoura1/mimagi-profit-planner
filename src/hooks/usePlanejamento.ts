@@ -28,6 +28,7 @@ export function usePlanejamento() {
       cpv: Number(item.cpv) || 0,
       conv: Number(item.conv) || 0,
       hasInvest: Boolean(item.hasInvest),
+      roas_esperado: Number(item.roas_esperado) || 0,
     }));
   };
 

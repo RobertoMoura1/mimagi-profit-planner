@@ -35,11 +35,11 @@ export function PlanejamentoCanais({ data, calculated, updateField }: Planejamen
   const canaisCalculados = canais.map(canal => {
     const faturamentoEsperado = faturamentoMensal * (canal.perc / 100);
     const pecasNecessarias = canal.ticket > 0 ? Math.ceil(faturamentoEsperado / canal.ticket) : 0;
-    const roas = canal.invest && canal.invest > 0 ? faturamentoEsperado / canal.invest : null;
+    const roas = canal.roas_esperado || null;
     const vendasParaPagarInvest = canal.invest && canal.ticket > 0 ? Math.ceil(canal.invest / canal.ticket) : null;
     
     let status: 'verde' | 'amarelo' | 'vermelho' = 'verde';
-    if (roas !== null) {
+    if (roas !== null && canal.hasInvest) {
       if (roas < 1) status = 'vermelho';
       else if (roas < 3) status = 'amarelo';
     }
@@ -76,9 +76,9 @@ export function PlanejamentoCanais({ data, calculated, updateField }: Planejamen
   }
   
   canaisCalculados.forEach(c => {
-    if (c.roas !== null && c.roas < 1) {
+    if (c.hasInvest && c.roas !== null && c.roas < 1) {
       alertasCanais.push({ type: 'danger', message: `ROAS do canal ${c.nome} está abaixo de 1 (${c.roas.toFixed(2)}). Investimento não se paga.` });
-    } else if (c.roas !== null && c.roas < 3) {
+    } else if (c.hasInvest && c.roas !== null && c.roas < 3) {
       alertasCanais.push({ type: 'warning', message: `ROAS do canal ${c.nome} está entre 1 e 3 (${c.roas.toFixed(2)}). Atenção ao retorno.` });
     }
   });
@@ -112,6 +112,7 @@ export function PlanejamentoCanais({ data, calculated, updateField }: Planejamen
       cpv: 0,
       conv: 0,
       hasInvest: false,
+      roas_esperado: 0,
     };
     
     updateField('canais_venda', [...canais, newCanal]);
@@ -224,6 +225,7 @@ export function PlanejamentoCanais({ data, calculated, updateField }: Planejamen
                   <th className="text-center p-3 font-semibold">Investimento</th>
                   <th className="text-center p-3 font-semibold">CPV</th>
                   <th className="text-center p-3 font-semibold">Conv. %</th>
+                  <th className="text-center p-3 font-semibold">ROAS Esperado</th>
                   <th className="text-center p-3 font-semibold">Tem Invest.?</th>
                   <th className="text-center p-3 font-semibold w-24">Ações</th>
                 </tr>
@@ -302,6 +304,17 @@ export function PlanejamentoCanais({ data, calculated, updateField }: Planejamen
                         disabled={!canal.hasInvest}
                       />
                     </td>
+                    <td className="p-2">
+                      <input
+                        type="number"
+                        value={canal.roas_esperado}
+                        onChange={(e) => updateCanal(canal.id, 'roas_esperado', Number(e.target.value))}
+                        className="w-20 px-2 py-1 bg-background border border-border text-foreground text-center font-mono text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                        min={0}
+                        step={0.1}
+                        disabled={!canal.hasInvest}
+                      />
+                    </td>
                     <td className="p-2 text-center">
                       <input
                         type="checkbox"
@@ -339,6 +352,7 @@ export function PlanejamentoCanais({ data, calculated, updateField }: Planejamen
                   </td>
                   <td className="text-center p-3 font-mono">-</td>
                   <td className="text-center p-3 font-mono">{formatCurrency(investimentoTotal)}</td>
+                  <td className="text-center p-3 font-mono">-</td>
                   <td className="text-center p-3 font-mono">-</td>
                   <td className="text-center p-3 font-mono">-</td>
                   <td className="text-center p-3">-</td>
