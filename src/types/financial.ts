@@ -1,3 +1,15 @@
+// Interface para canal de venda dinâmico
+export interface CanalVenda {
+  id: string;
+  nome: string;
+  perc: number;
+  ticket: number;
+  invest: number;
+  cpv: number;
+  conv: number;
+  hasInvest: boolean;
+}
+
 export interface PlanejamentoFinanceiro {
   id?: string;
   created_at?: string;
@@ -85,7 +97,10 @@ export interface PlanejamentoFinanceiro {
   custo_marketing: number;
   custo_outros: number;
   
-  // Seção 13: Planejamento por Canais de Venda
+  // Seção 13: Canais de Venda Dinâmicos
+  canais_venda: CanalVenda[];
+  
+  // Campos legados (mantidos para compatibilidade)
   canal_loja_fisica_perc: number;
   canal_instagram_ads_perc: number;
   canal_instagram_organico_perc: number;
@@ -94,7 +109,7 @@ export interface PlanejamentoFinanceiro {
   canal_indicacoes_perc: number;
   canal_eventos_perc: number;
   
-  // Investimentos por canal
+  // Investimentos por canal (legado)
   invest_instagram_ads: number;
   invest_promocoes: number;
   invest_whatsapp: number;
@@ -102,18 +117,18 @@ export interface PlanejamentoFinanceiro {
   invest_influenciadores: number;
   invest_outros: number;
   
-  // Ticket médio por canal
+  // Ticket médio por canal (legado)
   ticket_loja_fisica: number;
   ticket_instagram_ads: number;
   ticket_whatsapp: number;
   ticket_shopee: number;
   
-  // CPV por canal
+  // CPV por canal (legado)
   cpv_instagram_ads: number;
   cpv_whatsapp: number;
   cpv_shopee: number;
   
-  // Taxa de conversão por canal
+  // Taxa de conversão por canal (legado)
   conv_instagram_ads: number;
   conv_whatsapp: number;
   conv_shopee: number;
@@ -246,7 +261,18 @@ export const defaultPlanejamento: PlanejamentoFinanceiro = {
   custo_marketing: 1000,
   custo_outros: 500,
   
-  // Seção 13: Canais de Venda
+  // Seção 13: Canais de Venda Dinâmicos
+  canais_venda: [
+    { id: '1', nome: 'Loja Física', perc: 30, ticket: 180, invest: 0, cpv: 0, conv: 0, hasInvest: false },
+    { id: '2', nome: 'Instagram Ads', perc: 25, ticket: 150, invest: 2000, cpv: 25, conv: 2.5, hasInvest: true },
+    { id: '3', nome: 'Instagram Orgânico', perc: 15, ticket: 150, invest: 0, cpv: 0, conv: 0, hasInvest: false },
+    { id: '4', nome: 'WhatsApp', perc: 10, ticket: 140, invest: 300, cpv: 10, conv: 15, hasInvest: true },
+    { id: '5', nome: 'Shopee', perc: 10, ticket: 120, invest: 500, cpv: 15, conv: 3, hasInvest: true },
+    { id: '6', nome: 'Indicações/Recorrência', perc: 5, ticket: 180, invest: 0, cpv: 0, conv: 0, hasInvest: false },
+    { id: '7', nome: 'Eventos/Ações', perc: 5, ticket: 180, invest: 0, cpv: 0, conv: 0, hasInvest: false },
+  ],
+  
+  // Campos legados para compatibilidade
   canal_loja_fisica_perc: 30,
   canal_instagram_ads_perc: 25,
   canal_instagram_organico_perc: 15,

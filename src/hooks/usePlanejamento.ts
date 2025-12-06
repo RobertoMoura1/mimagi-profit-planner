@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { PlanejamentoFinanceiro, CalculatedValues, SimulationValues, Alert, defaultPlanejamento } from '@/types/financial';
+import { PlanejamentoFinanceiro, CalculatedValues, SimulationValues, Alert, defaultPlanejamento, CanalVenda } from '@/types/financial';
 import { toast } from '@/hooks/use-toast';
 
 export function usePlanejamento() {
@@ -14,6 +14,22 @@ export function usePlanejamento() {
   useEffect(() => {
     loadData();
   }, []);
+
+  const parseCanaisVenda = (jsonData: unknown): CanalVenda[] => {
+    if (!jsonData || !Array.isArray(jsonData)) {
+      return defaultPlanejamento.canais_venda;
+    }
+    return jsonData.map((item: Record<string, unknown>, index: number) => ({
+      id: String(item.id || index + 1),
+      nome: String(item.nome || ''),
+      perc: Number(item.perc) || 0,
+      ticket: Number(item.ticket) || 0,
+      invest: Number(item.invest) || 0,
+      cpv: Number(item.cpv) || 0,
+      conv: Number(item.conv) || 0,
+      hasInvest: Boolean(item.hasInvest),
+    }));
+  };
 
   const loadData = async () => {
     try {
@@ -29,6 +45,10 @@ export function usePlanejamento() {
       if (records && records.length > 0) {
         const record = records[0];
         setRecordId(record.id);
+        
+        // Parse canais_venda from JSON
+        const canaisVenda = parseCanaisVenda(record.canais_venda);
+        
         setData({
           investimento_ciclo: Number(record.investimento_ciclo) || defaultPlanejamento.investimento_ciclo,
           margem: Number(record.margem) || defaultPlanejamento.margem,
@@ -88,7 +108,9 @@ export function usePlanejamento() {
           custo_sistema: Number(record.custo_sistema) || defaultPlanejamento.custo_sistema,
           custo_marketing: Number(record.custo_marketing) || defaultPlanejamento.custo_marketing,
           custo_outros: Number(record.custo_outros) || defaultPlanejamento.custo_outros,
-          // Seção 13: Canais de Venda
+          // Seção 13: Canais de Venda Dinâmicos
+          canais_venda: canaisVenda,
+          // Campos legados
           canal_loja_fisica_perc: Number(record.canal_loja_fisica_perc) ?? defaultPlanejamento.canal_loja_fisica_perc,
           canal_instagram_ads_perc: Number(record.canal_instagram_ads_perc) ?? defaultPlanejamento.canal_instagram_ads_perc,
           canal_instagram_organico_perc: Number(record.canal_instagram_organico_perc) ?? defaultPlanejamento.canal_instagram_organico_perc,
@@ -137,11 +159,17 @@ export function usePlanejamento() {
     try {
       setSaving(true);
       
+      // Prepare data for Supabase - convert canais_venda to JSON-compatible format
+      const dbData = {
+        ...newData,
+        canais_venda: JSON.parse(JSON.stringify(newData.canais_venda)),
+      };
+      
       if (recordId) {
         // Atualizar registro existente
         const { error } = await supabase
           .from('planejamentos_financeiros')
-          .update(newData)
+          .update(dbData)
           .eq('id', recordId);
         
         if (error) throw error;
@@ -149,7 +177,7 @@ export function usePlanejamento() {
         // Criar novo registro
         const { data: result, error } = await supabase
           .from('planejamentos_financeiros')
-          .insert(newData)
+          .insert(dbData)
           .select()
           .single();
         
