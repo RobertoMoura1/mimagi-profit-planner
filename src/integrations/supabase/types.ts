@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       planejamentos_financeiros: {
         Row: {
+          canais_venda: Json | null
           canal_eventos_perc: number | null
           canal_indicacoes_perc: number | null
           canal_instagram_ads_perc: number | null
@@ -109,6 +110,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          canais_venda?: Json | null
           canal_eventos_perc?: number | null
           canal_indicacoes_perc?: number | null
           canal_instagram_ads_perc?: number | null
@@ -202,6 +204,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          canais_venda?: Json | null
           canal_eventos_perc?: number | null
           canal_indicacoes_perc?: number | null
           canal_instagram_ads_perc?: number | null
