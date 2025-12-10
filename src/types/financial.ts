@@ -26,6 +26,7 @@ export interface PlanejamentoFinanceiro {
   // Seção 1: Variáveis Principais
   investimento_ciclo: number;
   margem: number;
+  faturamento_realizado: number;
   
   // Seção 2: Distribuição por Público
   perc_menina: number;
@@ -215,6 +216,7 @@ export interface Alert {
 export const defaultPlanejamento: PlanejamentoFinanceiro = {
   investimento_ciclo: 60000,
   margem: 2,
+  faturamento_realizado: 0,
   perc_menina: 40,
   perc_menino: 35,
   perc_bebe: 25,
