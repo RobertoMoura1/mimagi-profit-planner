@@ -101,9 +101,21 @@ export function CustosFixos({ data, calculated, updateField }: Props) {
       </div>
 
       {/* Custos Extras Dinâmicos */}
-      {data.custos_extras.length > 0 && (
-        <div className="mb-6">
-          <h4 className="text-sm font-medium text-muted-foreground mb-3">Custos Adicionais</h4>
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <h4 className="text-sm font-medium text-muted-foreground">Custos Adicionais</h4>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={addCustoExtra}
+            className="gap-2 rounded-none"
+          >
+            <Plus className="w-4 h-4" />
+            Adicionar Custo
+          </Button>
+        </div>
+        
+        {data.custos_extras.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {data.custos_extras.map((custo) => (
               <div key={custo.id} className="flex items-end gap-2 p-3 bg-muted/30 border border-border">
@@ -135,19 +147,7 @@ export function CustosFixos({ data, calculated, updateField }: Props) {
               </div>
             ))}
           </div>
-        </div>
-      )}
-
-      <div className="mb-6">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={addCustoExtra}
-          className="gap-2 rounded-none"
-        >
-          <Plus className="w-4 h-4" />
-          Adicionar Custo
-        </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
