@@ -65,6 +65,7 @@ export function usePlanejamento() {
         setData({
           investimento_ciclo: Number(record.investimento_ciclo) || defaultPlanejamento.investimento_ciclo,
           margem: Number(record.margem) || defaultPlanejamento.margem,
+          faturamento_realizado: Number(record.faturamento_realizado) || 0,
           perc_menina: Number(record.perc_menina) || defaultPlanejamento.perc_menina,
           perc_menino: Number(record.perc_menino) || defaultPlanejamento.perc_menino,
           perc_bebe: Number(record.perc_bebe) || defaultPlanejamento.perc_bebe,

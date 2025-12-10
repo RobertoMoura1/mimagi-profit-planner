@@ -12,6 +12,7 @@ import { PontoEquilibrio } from '@/components/dashboard/sections/PontoEquilibrio
 import { AlertasAutomaticos } from '@/components/dashboard/sections/AlertasAutomaticos';
 import { Simulacao } from '@/components/dashboard/sections/Simulacao';
 import { PlanejamentoCanais } from '@/components/dashboard/sections/PlanejamentoCanais';
+import { AcompanhamentoMeta } from '@/components/dashboard/sections/AcompanhamentoMeta';
 import { Loader2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -79,6 +80,7 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="resultados" className="space-y-6">
+            <AcompanhamentoMeta data={data} calculated={calculated} updateField={updateField} />
             <ResultadoLucro calculated={calculated} />
             <PontoEquilibrio calculated={calculated} />
             <AlertasAutomaticos alerts={alerts} />

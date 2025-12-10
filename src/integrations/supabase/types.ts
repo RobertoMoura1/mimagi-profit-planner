@@ -49,6 +49,7 @@ export type Database = {
           custo_salarios: number | null
           custo_sistema: number | null
           custos_extras: Json | null
+          faturamento_realizado: number | null
           id: string
           invest_influenciadores: number | null
           invest_instagram_ads: number | null
@@ -144,6 +145,7 @@ export type Database = {
           custo_salarios?: number | null
           custo_sistema?: number | null
           custos_extras?: Json | null
+          faturamento_realizado?: number | null
           id?: string
           invest_influenciadores?: number | null
           invest_instagram_ads?: number | null
@@ -239,6 +241,7 @@ export type Database = {
           custo_salarios?: number | null
           custo_sistema?: number | null
           custos_extras?: Json | null
+          faturamento_realizado?: number | null
           id?: string
           invest_influenciadores?: number | null
           invest_instagram_ads?: number | null
