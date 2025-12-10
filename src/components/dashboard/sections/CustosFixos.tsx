@@ -1,9 +1,11 @@
-import { Building2 } from 'lucide-react';
+import { Building2, Plus, Trash2 } from 'lucide-react';
 import { SectionCard } from '../SectionCard';
 import { InputField } from '../InputField';
 import { MetricCard } from '../MetricCard';
-import { PlanejamentoFinanceiro, CalculatedValues } from '@/types/financial';
+import { PlanejamentoFinanceiro, CalculatedValues, CustoExtra } from '@/types/financial';
 import { formatCurrency } from '@/utils/formatters';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 interface Props {
   data: PlanejamentoFinanceiro;
@@ -12,6 +14,27 @@ interface Props {
 }
 
 export function CustosFixos({ data, calculated, updateField }: Props) {
+  const addCustoExtra = () => {
+    const newCusto: CustoExtra = {
+      id: Date.now().toString(),
+      nome: 'Novo Custo',
+      valor: 0,
+    };
+    updateField('custos_extras', [...data.custos_extras, newCusto]);
+  };
+
+  const updateCustoExtra = (id: string, field: keyof CustoExtra, value: string | number) => {
+    const updated = data.custos_extras.map(c => 
+      c.id === id ? { ...c, [field]: value } : c
+    );
+    updateField('custos_extras', updated);
+  };
+
+  const removeCustoExtra = (id: string) => {
+    const updated = data.custos_extras.filter(c => c.id !== id);
+    updateField('custos_extras', updated);
+  };
+
   return (
     <SectionCard title="7. CUSTOS FIXOS MENSAIS" icon={<Building2 className="w-5 h-5" />}>
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
@@ -75,6 +98,56 @@ export function CustosFixos({ data, calculated, updateField }: Props) {
           onChange={(v) => updateField('custo_outros', v as number)}
           prefix="R$"
         />
+      </div>
+
+      {/* Custos Extras Dinâmicos */}
+      {data.custos_extras.length > 0 && (
+        <div className="mb-6">
+          <h4 className="text-sm font-medium text-muted-foreground mb-3">Custos Adicionais</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {data.custos_extras.map((custo) => (
+              <div key={custo.id} className="flex items-end gap-2 p-3 bg-muted/30 border border-border">
+                <div className="flex-1">
+                  <label className="text-xs text-muted-foreground mb-1 block">Nome</label>
+                  <Input
+                    value={custo.nome}
+                    onChange={(e) => updateCustoExtra(custo.id, 'nome', e.target.value)}
+                    className="h-9 rounded-none text-sm"
+                  />
+                </div>
+                <div className="w-32">
+                  <label className="text-xs text-muted-foreground mb-1 block">Valor (R$)</label>
+                  <Input
+                    type="number"
+                    value={custo.valor}
+                    onChange={(e) => updateCustoExtra(custo.id, 'valor', Number(e.target.value))}
+                    className="h-9 rounded-none text-sm font-mono"
+                  />
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => removeCustoExtra(custo.id)}
+                  className="h-9 w-9 text-destructive hover:text-destructive hover:bg-destructive/10 rounded-none"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="mb-6">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={addCustoExtra}
+          className="gap-2 rounded-none"
+        >
+          <Plus className="w-4 h-4" />
+          Adicionar Custo
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

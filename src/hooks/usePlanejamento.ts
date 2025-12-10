@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { PlanejamentoFinanceiro, CalculatedValues, SimulationValues, Alert, defaultPlanejamento, CanalVenda } from '@/types/financial';
+import { PlanejamentoFinanceiro, CalculatedValues, SimulationValues, Alert, defaultPlanejamento, CanalVenda, CustoExtra } from '@/types/financial';
 import { toast } from '@/hooks/use-toast';
 
 export function usePlanejamento() {
@@ -32,6 +32,17 @@ export function usePlanejamento() {
     }));
   };
 
+  const parseCustosExtras = (jsonData: unknown): CustoExtra[] => {
+    if (!jsonData || !Array.isArray(jsonData)) {
+      return [];
+    }
+    return jsonData.map((item: Record<string, unknown>, index: number) => ({
+      id: String(item.id || index + 1),
+      nome: String(item.nome || ''),
+      valor: Number(item.valor) || 0,
+    }));
+  };
+
   const loadData = async () => {
     try {
       setLoading(true);
@@ -47,8 +58,9 @@ export function usePlanejamento() {
         const record = records[0];
         setRecordId(record.id);
         
-        // Parse canais_venda from JSON
+        // Parse canais_venda and custos_extras from JSON
         const canaisVenda = parseCanaisVenda(record.canais_venda);
+        const custosExtras = parseCustosExtras(record.custos_extras);
         
         setData({
           investimento_ciclo: Number(record.investimento_ciclo) || defaultPlanejamento.investimento_ciclo,
@@ -109,6 +121,8 @@ export function usePlanejamento() {
           custo_sistema: Number(record.custo_sistema) || defaultPlanejamento.custo_sistema,
           custo_marketing: Number(record.custo_marketing) || defaultPlanejamento.custo_marketing,
           custo_outros: Number(record.custo_outros) || defaultPlanejamento.custo_outros,
+          // Custos extras dinâmicos
+          custos_extras: custosExtras,
           // Seção 13: Canais de Venda Dinâmicos
           canais_venda: canaisVenda,
           // Campos legados
@@ -160,10 +174,11 @@ export function usePlanejamento() {
     try {
       setSaving(true);
       
-      // Prepare data for Supabase - convert canais_venda to JSON-compatible format
+      // Prepare data for Supabase - convert canais_venda and custos_extras to JSON-compatible format
       const dbData = {
         ...newData,
         canais_venda: JSON.parse(JSON.stringify(newData.canais_venda)),
+        custos_extras: JSON.parse(JSON.stringify(newData.custos_extras)),
       };
       
       if (recordId) {
@@ -245,7 +260,8 @@ export function usePlanejamento() {
     
     custo_fixo_mensal: data.custo_aluguel + data.custo_salarios + data.custo_encargos + 
                        data.custo_agua_luz + data.custo_internet + data.custo_contador + 
-                       data.custo_embalagens + data.custo_sistema + data.custo_marketing + data.custo_outros,
+                       data.custo_embalagens + data.custo_sistema + data.custo_marketing + data.custo_outros +
+                       data.custos_extras.reduce((sum, c) => sum + c.valor, 0),
     custo_fixo_ciclo: 0, // Calculado abaixo
     custo_produtos: data.investimento_ciclo / 6,
     

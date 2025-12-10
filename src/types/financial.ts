@@ -11,6 +11,13 @@ export interface CanalVenda {
   roas_esperado: number;
 }
 
+// Interface para custo extra dinâmico
+export interface CustoExtra {
+  id: string;
+  nome: string;
+  valor: number;
+}
+
 export interface PlanejamentoFinanceiro {
   id?: string;
   created_at?: string;
@@ -97,6 +104,9 @@ export interface PlanejamentoFinanceiro {
   custo_sistema: number;
   custo_marketing: number;
   custo_outros: number;
+  
+  // Custos extras dinâmicos
+  custos_extras: CustoExtra[];
   
   // Seção 13: Canais de Venda Dinâmicos
   canais_venda: CanalVenda[];
@@ -261,6 +271,9 @@ export const defaultPlanejamento: PlanejamentoFinanceiro = {
   custo_sistema: 200,
   custo_marketing: 1000,
   custo_outros: 500,
+  
+  // Custos extras dinâmicos
+  custos_extras: [],
   
   // Seção 13: Canais de Venda Dinâmicos
   canais_venda: [
