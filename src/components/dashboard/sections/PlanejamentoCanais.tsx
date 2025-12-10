@@ -157,6 +157,14 @@ export function PlanejamentoCanais({ data, calculated, updateField }: Planejamen
   return (
     <div className="space-y-6">
       <SectionCard title="13. PLANEJAMENTO POR CANAIS DE VENDA">
+        {/* Card de Faturamento Mensal Total */}
+        <div className="mb-6 p-4 bg-primary/10 border border-primary/30">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-muted-foreground">Faturamento Mensal Total (Meta)</span>
+            <span className="text-2xl font-bold font-mono text-primary">{formatCurrency(faturamentoMensal)}</span>
+          </div>
+        </div>
+
         {/* Alertas */}
         {alertasCanais.length > 0 && (
           <div className="mb-6">
