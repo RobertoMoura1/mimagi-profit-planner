@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { SectionCard } from '../SectionCard';
-import { InputField } from '../InputField';
-import { Compra, defaultCompra } from '@/types/compras';
+import { Compra, defaultCompra, CalendarioCompra } from '@/types/compras';
 import { formatCurrency } from '@/utils/formatters';
-import { Plus, Trash2, Package, Calendar, DollarSign, Truck } from 'lucide-react';
+import { Plus, Trash2, Package, Calendar, Eye, Truck, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface Props {
   compras: Compra[];
@@ -13,12 +13,14 @@ interface Props {
   addCompra: (compra: Omit<Compra, 'id'>) => void;
   updateCompra: (id: string, updates: Partial<Compra>) => void;
   removeCompra: (id: string) => void;
+  calcularCalendario: (compra: Compra) => CalendarioCompra;
   totalComprometido: number;
 }
 
-export function ComprasPagamentos({ compras, saving, addCompra, updateCompra, removeCompra, totalComprometido }: Props) {
+export function ComprasPagamentos({ compras, saving, addCompra, updateCompra, removeCompra, calcularCalendario, totalComprometido }: Props) {
   const [novaCompra, setNovaCompra] = useState<Omit<Compra, 'id'>>(defaultCompra);
   const [showForm, setShowForm] = useState(false);
+  const [calendarioModal, setCalendarioModal] = useState<CalendarioCompra | null>(null);
 
   const handleAddCompra = () => {
     if (!novaCompra.estacao || !novaCompra.marca || novaCompra.valor_total <= 0) {
@@ -30,15 +32,41 @@ export function ComprasPagamentos({ compras, saving, addCompra, updateCompra, re
   };
 
   const calcularInfoCompra = (compra: Compra) => {
+    const mesesPrazo = Math.round(compra.prazo_pagamento / 30);
     const valorPorEntrega = compra.valor_total / compra.num_entregas;
-    const valorPorQuinzena = valorPorEntrega / 12;
+    const valorPorParcela = valorPorEntrega / mesesPrazo;
     
     return {
       valorPorEntrega,
-      valorPorQuinzena,
-      totalParcelas: compra.num_entregas * 12,
+      valorPorParcela,
+      mesesPrazo,
+      totalParcelas: compra.num_entregas * mesesPrazo,
     };
   };
+
+  const verificarConsistencia = (compra: typeof novaCompra) => {
+    const avisos: string[] = [];
+    const datasPreenchidas = [compra.data_entrega_1, compra.data_entrega_2, compra.data_entrega_3, compra.data_entrega_4]
+      .slice(0, compra.num_entregas)
+      .filter(Boolean).length;
+    
+    if (datasPreenchidas < compra.num_entregas) {
+      avisos.push(`Faltam ${compra.num_entregas - datasPreenchidas} data(s) de entrega`);
+    }
+
+    if (compra.prazo_pagamento % 30 !== 0) {
+      avisos.push(`Prazo ${compra.prazo_pagamento} dias não é múltiplo de 30 (será arredondado para ${Math.round(compra.prazo_pagamento / 30)} meses)`);
+    }
+
+    return avisos;
+  };
+
+  const abrirCalendario = (compra: Compra) => {
+    const calendario = calcularCalendario(compra);
+    setCalendarioModal(calendario);
+  };
+
+  const prazoNaoMultiplo30 = novaCompra.prazo_pagamento % 30 !== 0;
 
   return (
     <SectionCard title="Compras & Pagamentos" icon={<Package className="w-5 h-5" />}>
@@ -54,7 +82,7 @@ export function ComprasPagamentos({ compras, saving, addCompra, updateCompra, re
         </div>
         <div className="stat-block">
           <span className="stat-label">Prazo Padrão</span>
-          <span className="stat-value">180 dias</span>
+          <span className="stat-value">180 dias (6 meses)</span>
         </div>
       </div>
 
@@ -77,7 +105,7 @@ export function ComprasPagamentos({ compras, saving, addCompra, updateCompra, re
             Nova Compra
           </h4>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
             <div>
               <label className="corporate-label">Estação</label>
               <input
@@ -94,7 +122,7 @@ export function ComprasPagamentos({ compras, saving, addCompra, updateCompra, re
               <input
                 type="text"
                 className="corporate-input text-left"
-                placeholder="Ex: Marca A"
+                placeholder="Ex: Nini Bambini"
                 value={novaCompra.marca}
                 onChange={(e) => setNovaCompra(prev => ({ ...prev, marca: e.target.value }))}
               />
@@ -127,6 +155,22 @@ export function ComprasPagamentos({ compras, saving, addCompra, updateCompra, re
                 </SelectContent>
               </Select>
             </div>
+
+            <div>
+              <label className="corporate-label">Prazo (dias)</label>
+              <input
+                type="number"
+                className="corporate-input"
+                value={novaCompra.prazo_pagamento}
+                onChange={(e) => setNovaCompra(prev => ({ ...prev, prazo_pagamento: Number(e.target.value) || 180 }))}
+              />
+              {prazoNaoMultiplo30 && (
+                <span className="text-xs text-warning flex items-center gap-1 mt-1">
+                  <AlertTriangle className="w-3 h-3" />
+                  Arredondado para {Math.round(novaCompra.prazo_pagamento / 30)} meses
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Datas de entrega */}
@@ -149,6 +193,41 @@ export function ComprasPagamentos({ compras, saving, addCompra, updateCompra, re
               </div>
             ))}
           </div>
+
+          {/* Avisos de consistência */}
+          {verificarConsistencia(novaCompra).length > 0 && (
+            <div className="bg-warning/10 border-l-4 border-warning p-3 mb-4">
+              <div className="flex items-center gap-2 text-warning font-semibold text-sm mb-1">
+                <AlertTriangle className="w-4 h-4" />
+                Atenção
+              </div>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                {verificarConsistencia(novaCompra).map((aviso, i) => (
+                  <li key={i}>• {aviso}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Preview dos valores calculados */}
+          {novaCompra.valor_total > 0 && novaCompra.num_entregas > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-3 bg-muted/50 border border-border">
+              <div>
+                <span className="text-xs text-muted-foreground uppercase">Valor/Entrega</span>
+                <div className="font-mono text-lg">{formatCurrency(novaCompra.valor_total / novaCompra.num_entregas)}</div>
+              </div>
+              <div>
+                <span className="text-xs text-muted-foreground uppercase">Meses do Prazo</span>
+                <div className="font-mono text-lg">{Math.round(novaCompra.prazo_pagamento / 30)}</div>
+              </div>
+              <div>
+                <span className="text-xs text-muted-foreground uppercase">Valor/Parcela</span>
+                <div className="font-mono text-lg text-accent">
+                  {formatCurrency((novaCompra.valor_total / novaCompra.num_entregas) / Math.round(novaCompra.prazo_pagamento / 30))}
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="flex gap-2">
             <Button
@@ -182,9 +261,9 @@ export function ComprasPagamentos({ compras, saving, addCompra, updateCompra, re
                 <th>Valor Total</th>
                 <th>Entregas</th>
                 <th>Valor/Entrega</th>
-                <th>Valor/Quinzena</th>
+                <th>Valor/Parcela</th>
                 <th>Datas Entrega</th>
-                <th className="w-16">Ações</th>
+                <th className="w-24">Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -201,7 +280,7 @@ export function ComprasPagamentos({ compras, saving, addCompra, updateCompra, re
                     <td className="font-mono">{formatCurrency(compra.valor_total)}</td>
                     <td className="text-center">{compra.num_entregas}</td>
                     <td className="font-mono text-muted-foreground">{formatCurrency(info.valorPorEntrega)}</td>
-                    <td className="font-mono text-muted-foreground">{formatCurrency(info.valorPorQuinzena)}</td>
+                    <td className="font-mono text-accent">{formatCurrency(info.valorPorParcela)}</td>
                     <td className="text-sm">
                       {datas.map((d, i) => (
                         <span key={i} className="mr-2">
@@ -210,14 +289,25 @@ export function ComprasPagamentos({ compras, saving, addCompra, updateCompra, re
                       ))}
                     </td>
                     <td>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => removeCompra(compra.id)}
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <div className="flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => abrirCalendario(compra)}
+                          className="text-accent hover:text-accent hover:bg-accent/10"
+                          title="Ver calendário de pagamentos"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => removeCompra(compra.id)}
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -243,11 +333,94 @@ export function ComprasPagamentos({ compras, saving, addCompra, updateCompra, re
         </h5>
         <ul className="space-y-1 text-muted-foreground">
           <li>• Início do pagamento: 30 dias após cada entrega</li>
-          <li>• Término do pagamento: 210 dias após cada entrega (30 + 180)</li>
-          <li>• Pagamento em quinzenas fixas: dia 15 e último dia do mês</li>
-          <li>• Cada entrega gera 12 parcelas quinzenais</li>
+          <li>• Término do pagamento: início + prazo (ex: 180 dias = 6 parcelas mensais)</li>
+          <li>• Número de parcelas por entrega = Prazo ÷ 30 dias</li>
+          <li>• Valor por parcela = Valor da entrega ÷ número de meses</li>
+          <li>• Parcelas posicionadas no dia 01 ou 15 conforme data de início</li>
         </ul>
       </div>
+
+      {/* Modal Calendário */}
+      <Dialog open={!!calendarioModal} onOpenChange={() => setCalendarioModal(null)}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto rounded-none">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Calendar className="w-5 h-5" />
+              Calendário de Pagamentos - {calendarioModal?.marca} ({calendarioModal?.estacao})
+            </DialogTitle>
+          </DialogHeader>
+
+          {calendarioModal && (
+            <div className="space-y-6">
+              {/* Resumo */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="stat-block">
+                  <span className="stat-label">Valor Total</span>
+                  <span className="stat-value">{formatCurrency(calendarioModal.valor_total)}</span>
+                </div>
+                <div className="stat-block">
+                  <span className="stat-label">Valor/Entrega</span>
+                  <span className="stat-value">{formatCurrency(calendarioModal.valor_por_entrega)}</span>
+                </div>
+                <div className="stat-block">
+                  <span className="stat-label">Meses do Prazo</span>
+                  <span className="stat-value">{calendarioModal.meses_prazo}</span>
+                </div>
+                <div className="stat-block">
+                  <span className="stat-label">Valor/Parcela</span>
+                  <span className="stat-value text-accent">{formatCurrency(calendarioModal.valor_por_parcela)}</span>
+                </div>
+              </div>
+
+              {/* Entregas */}
+              {calendarioModal.entregas.map((entrega) => (
+                <div key={entrega.entrega_num} className="border border-border">
+                  <div className="bg-muted p-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Truck className="w-4 h-4" />
+                      <span className="font-semibold">Entrega {entrega.entrega_num}</span>
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {entrega.data_entrega.toLocaleDateString('pt-BR')} → Pagamento: {entrega.inicio_pagamento.toLocaleDateString('pt-BR')} a {entrega.fim_pagamento.toLocaleDateString('pt-BR')}
+                    </div>
+                  </div>
+                  
+                  <div className="overflow-x-auto">
+                    <table className="corporate-table">
+                      <thead>
+                        <tr>
+                          <th>Parcela</th>
+                          <th>Competência</th>
+                          <th>Dia</th>
+                          <th className="text-right">Valor</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {entrega.parcelas.map((parcela, idx) => (
+                          <tr key={idx}>
+                            <td>{parcela.parcela_num}/{calendarioModal.meses_prazo}</td>
+                            <td className="font-mono">{parcela.competencia_mes}</td>
+                            <td>{parcela.data_referencia}</td>
+                            <td className="text-right font-mono">{formatCurrency(parcela.valor)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      <tfoot>
+                        <tr className="bg-muted">
+                          <td colSpan={3} className="font-semibold">Total Entrega {entrega.entrega_num}</td>
+                          <td className="text-right font-mono font-semibold">
+                            {formatCurrency(entrega.parcelas.reduce((sum, p) => sum + p.valor, 0))}
+                          </td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </SectionCard>
   );
 }

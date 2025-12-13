@@ -30,6 +30,7 @@ const Index = () => {
     addCompra,
     updateCompra,
     removeCompra,
+    calcularCalendario,
     calcularFluxoCaixa,
     calcularResumoExecutivo,
     getTotalComprometido,
@@ -112,6 +113,7 @@ const Index = () => {
               addCompra={addCompra}
               updateCompra={updateCompra}
               removeCompra={removeCompra}
+              calcularCalendario={calcularCalendario}
               totalComprometido={totalComprometido}
             />
           </TabsContent>
