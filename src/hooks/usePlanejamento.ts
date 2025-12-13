@@ -344,5 +344,6 @@ export function usePlanejamento() {
     updateField,
     calculateSimulation,
     ticket_medio_geral,
+    recordId,
   };
 }

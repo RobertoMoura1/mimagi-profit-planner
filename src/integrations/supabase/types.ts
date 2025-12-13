@@ -14,6 +14,62 @@ export type Database = {
   }
   public: {
     Tables: {
+      compras: {
+        Row: {
+          created_at: string
+          data_entrega_1: string | null
+          data_entrega_2: string | null
+          data_entrega_3: string | null
+          data_entrega_4: string | null
+          estacao: string
+          id: string
+          marca: string
+          num_entregas: number
+          planejamento_id: string | null
+          prazo_pagamento: number
+          updated_at: string
+          valor_total: number
+        }
+        Insert: {
+          created_at?: string
+          data_entrega_1?: string | null
+          data_entrega_2?: string | null
+          data_entrega_3?: string | null
+          data_entrega_4?: string | null
+          estacao: string
+          id?: string
+          marca: string
+          num_entregas?: number
+          planejamento_id?: string | null
+          prazo_pagamento?: number
+          updated_at?: string
+          valor_total?: number
+        }
+        Update: {
+          created_at?: string
+          data_entrega_1?: string | null
+          data_entrega_2?: string | null
+          data_entrega_3?: string | null
+          data_entrega_4?: string | null
+          estacao?: string
+          id?: string
+          marca?: string
+          num_entregas?: number
+          planejamento_id?: string | null
+          prazo_pagamento?: number
+          updated_at?: string
+          valor_total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compras_planejamento_id_fkey"
+            columns: ["planejamento_id"]
+            isOneToOne: false
+            referencedRelation: "planejamentos_financeiros"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       planejamentos_financeiros: {
         Row: {
           canais_venda: Json | null
