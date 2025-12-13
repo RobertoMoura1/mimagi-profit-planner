@@ -1,4 +1,5 @@
 import { usePlanejamento } from '@/hooks/usePlanejamento';
+import { useCompras } from '@/hooks/useCompras';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { VariaveisPrincipais } from '@/components/dashboard/sections/VariaveisPrincipais';
 import { DistribuicaoPublico } from '@/components/dashboard/sections/DistribuicaoPublico';
@@ -13,11 +14,26 @@ import { AlertasAutomaticos } from '@/components/dashboard/sections/AlertasAutom
 import { Simulacao } from '@/components/dashboard/sections/Simulacao';
 import { PlanejamentoCanais } from '@/components/dashboard/sections/PlanejamentoCanais';
 import { AcompanhamentoMeta } from '@/components/dashboard/sections/AcompanhamentoMeta';
+import { ComprasPagamentos } from '@/components/dashboard/sections/ComprasPagamentos';
+import { FluxoCaixa } from '@/components/dashboard/sections/FluxoCaixa';
+import { VisaoDiretoria } from '@/components/dashboard/sections/VisaoDiretoria';
 import { Loader2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const Index = () => {
-  const { data, calculated, alerts, loading, saving, updateField, calculateSimulation } = usePlanejamento();
+  const { data, calculated, alerts, loading, saving, updateField, calculateSimulation, recordId } = usePlanejamento();
+  
+  const { 
+    compras, 
+    loading: comprasLoading, 
+    saving: comprasSaving,
+    addCompra,
+    updateCompra,
+    removeCompra,
+    calcularFluxoCaixa,
+    calcularResumoExecutivo,
+    getTotalComprometido,
+  } = useCompras(recordId, calculated.custo_fixo_mensal, data.margem, calculated.faturamento_mensal);
 
   if (loading) {
     return (
@@ -30,32 +46,42 @@ const Index = () => {
     );
   }
 
+  const fluxoCaixa = calcularFluxoCaixa();
+  const resumoExecutivo = calcularResumoExecutivo();
+  const totalComprometido = getTotalComprometido();
+
   return (
     <div className="min-h-screen bg-background">
-      <DashboardHeader saving={saving} />
+      <DashboardHeader saving={saving || comprasSaving} />
       
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="variaveis" className="w-full">
           <TabsList className="w-full flex flex-wrap h-auto gap-1 bg-muted/50 p-2 mb-6">
-            <TabsTrigger value="variaveis" className="flex-1 min-w-[100px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
+            <TabsTrigger value="variaveis" className="flex-1 min-w-[80px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground text-xs sm:text-sm">
               Variáveis
             </TabsTrigger>
-            <TabsTrigger value="distribuicao" className="flex-1 min-w-[100px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
+            <TabsTrigger value="distribuicao" className="flex-1 min-w-[80px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground text-xs sm:text-sm">
               Distribuição
             </TabsTrigger>
-            <TabsTrigger value="produtos" className="flex-1 min-w-[100px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
+            <TabsTrigger value="produtos" className="flex-1 min-w-[80px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground text-xs sm:text-sm">
               Produtos
             </TabsTrigger>
-            <TabsTrigger value="custos" className="flex-1 min-w-[100px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
+            <TabsTrigger value="custos" className="flex-1 min-w-[80px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground text-xs sm:text-sm">
               Custos
             </TabsTrigger>
-            <TabsTrigger value="resultados" className="flex-1 min-w-[100px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
+            <TabsTrigger value="compras" className="flex-1 min-w-[80px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground text-xs sm:text-sm">
+              Compras
+            </TabsTrigger>
+            <TabsTrigger value="fluxo" className="flex-1 min-w-[80px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground text-xs sm:text-sm">
+              Fluxo Caixa
+            </TabsTrigger>
+            <TabsTrigger value="resultados" className="flex-1 min-w-[80px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground text-xs sm:text-sm">
               Resultados
             </TabsTrigger>
-            <TabsTrigger value="simulacao" className="flex-1 min-w-[100px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
+            <TabsTrigger value="simulacao" className="flex-1 min-w-[80px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground text-xs sm:text-sm">
               Simulação
             </TabsTrigger>
-            <TabsTrigger value="canais" className="flex-1 min-w-[100px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
+            <TabsTrigger value="canais" className="flex-1 min-w-[80px] data-[state=active]:bg-accent data-[state=active]:text-accent-foreground text-xs sm:text-sm">
               Canais
             </TabsTrigger>
           </TabsList>
@@ -77,6 +103,22 @@ const Index = () => {
 
           <TabsContent value="custos" className="space-y-6">
             <CustosFixos data={data} calculated={calculated} updateField={updateField} />
+          </TabsContent>
+
+          <TabsContent value="compras" className="space-y-6">
+            <ComprasPagamentos 
+              compras={compras}
+              saving={comprasSaving}
+              addCompra={addCompra}
+              updateCompra={updateCompra}
+              removeCompra={removeCompra}
+              totalComprometido={totalComprometido}
+            />
+          </TabsContent>
+
+          <TabsContent value="fluxo" className="space-y-6">
+            <VisaoDiretoria resumo={resumoExecutivo} totalComprometido={totalComprometido} />
+            <FluxoCaixa fluxoCaixa={fluxoCaixa} faturamentoMensal={calculated.faturamento_mensal} />
           </TabsContent>
 
           <TabsContent value="resultados" className="space-y-6">
