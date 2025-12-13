@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Compra, ParcelaCalculada, FluxoCaixaMensal, ResumoExecutivo } from '@/types/compras';
+import { Compra, ParcelaCalculada, FluxoCaixaMensal, ResumoExecutivo, CalendarioCompra } from '@/types/compras';
 import { toast } from '@/hooks/use-toast';
 
 export function useCompras(planejamentoId: string | null, custoFixoMensal: number, margem: number, faturamentoMensal: number) {
@@ -162,7 +162,12 @@ export function useCompras(planejamentoId: string | null, custoFixoMensal: numbe
     }
   }, []);
 
-  // Calcular parcelas para uma compra
+  // Calcular número de meses do prazo
+  const calcularMesesPrazo = (prazoDias: number): number => {
+    return Math.round(prazoDias / 30);
+  };
+
+  // Calcular parcelas para uma compra (modelo mensal)
   const calcularParcelas = (compra: Compra): ParcelaCalculada[] => {
     const parcelas: ParcelaCalculada[] = [];
     const entregas = [compra.data_entrega_1, compra.data_entrega_2, compra.data_entrega_3, compra.data_entrega_4]
@@ -171,18 +176,44 @@ export function useCompras(planejamentoId: string | null, custoFixoMensal: numbe
 
     if (entregas.length === 0) return parcelas;
 
+    const mesesPrazo = calcularMesesPrazo(compra.prazo_pagamento);
     const valorPorEntrega = compra.valor_total / compra.num_entregas;
-    const valorPorQuinzena = valorPorEntrega / 12;
+    const valorPorParcela = valorPorEntrega / mesesPrazo;
 
     entregas.forEach((dataEntrega, entregaIndex) => {
-      const dataBase = new Date(dataEntrega);
+      const dataBase = new Date(dataEntrega + 'T00:00:00');
+      
       // Início do pagamento = entrega + 30 dias
       const inicioPagamento = new Date(dataBase);
       inicioPagamento.setDate(inicioPagamento.getDate() + 30);
+      
+      // Fim do pagamento = início + prazo
+      const fimPagamento = new Date(inicioPagamento);
+      fimPagamento.setDate(fimPagamento.getDate() + compra.prazo_pagamento);
 
-      // Gerar 12 parcelas quinzenais
-      for (let i = 0; i < 12; i++) {
-        const dataVencimento = calcularProximaQuinzena(inicioPagamento, i);
+      // Determinar se a 1ª parcela cai no dia 1 ou 15
+      // Se INICIO cair entre dia 1 e 15 → parcela entra no dia 15
+      // Se cair após dia 15 → parcela entra no dia 01 do mês seguinte
+      let mesAtual = new Date(inicioPagamento);
+      let dataReferenciaPrimeira: '01' | '15';
+      
+      if (inicioPagamento.getDate() <= 15) {
+        dataReferenciaPrimeira = '15';
+        mesAtual.setDate(15);
+      } else {
+        dataReferenciaPrimeira = '01';
+        mesAtual.setMonth(mesAtual.getMonth() + 1);
+        mesAtual.setDate(1);
+      }
+
+      // Gerar MESES_PRAZO parcelas mensais
+      for (let i = 0; i < mesesPrazo; i++) {
+        const competenciaMes = `${mesAtual.getFullYear()}-${String(mesAtual.getMonth() + 1).padStart(2, '0')}`;
+        
+        // Alternar entre 01 e 15 mensalmente
+        const dataReferencia: '01' | '15' = i === 0 
+          ? dataReferenciaPrimeira 
+          : (i % 2 === 0 ? dataReferenciaPrimeira : (dataReferenciaPrimeira === '01' ? '15' : '01'));
         
         parcelas.push({
           compra_id: compra.id,
@@ -190,40 +221,60 @@ export function useCompras(planejamentoId: string | null, custoFixoMensal: numbe
           estacao: compra.estacao,
           entrega_num: entregaIndex + 1,
           parcela_num: i + 1,
-          data_vencimento: dataVencimento,
-          valor: valorPorQuinzena,
-          mes: `${dataVencimento.getFullYear()}-${String(dataVencimento.getMonth() + 1).padStart(2, '0')}`,
+          data_referencia: dataReferencia,
+          competencia_mes: competenciaMes,
+          valor: valorPorParcela,
+          inicio_entrega: inicioPagamento,
+          fim_entrega: fimPagamento,
         });
+
+        // Avançar para o próximo mês
+        mesAtual.setMonth(mesAtual.getMonth() + 1);
       }
     });
 
     return parcelas;
   };
 
-  // Calcular próxima quinzena (dia 15 ou último dia do mês)
-  const calcularProximaQuinzena = (dataBase: Date, quinzenasAFrente: number): Date => {
-    let data = new Date(dataBase);
-    
-    // Ajustar para próxima quinzena
-    if (data.getDate() <= 15) {
-      data.setDate(15);
-    } else {
-      // Último dia do mês
-      data = new Date(data.getFullYear(), data.getMonth() + 1, 0);
-    }
+  // Calcular calendário de pagamentos para uma compra
+  const calcularCalendario = (compra: Compra): CalendarioCompra => {
+    const mesesPrazo = calcularMesesPrazo(compra.prazo_pagamento);
+    const valorPorEntrega = compra.valor_total / compra.num_entregas;
+    const valorPorParcela = valorPorEntrega / mesesPrazo;
 
-    // Avançar quinzenas
-    for (let i = 0; i < quinzenasAFrente; i++) {
-      if (data.getDate() === 15) {
-        // Próxima quinzena = último dia do mesmo mês
-        data = new Date(data.getFullYear(), data.getMonth() + 1, 0);
-      } else {
-        // Próxima quinzena = dia 15 do próximo mês
-        data = new Date(data.getFullYear(), data.getMonth() + 1, 15);
-      }
-    }
+    const entregas = [compra.data_entrega_1, compra.data_entrega_2, compra.data_entrega_3, compra.data_entrega_4]
+      .slice(0, compra.num_entregas)
+      .filter((d): d is string => d !== null);
 
-    return data;
+    const entregasCalendario = entregas.map((dataEntrega, index) => {
+      const dataBase = new Date(dataEntrega + 'T00:00:00');
+      const inicioPagamento = new Date(dataBase);
+      inicioPagamento.setDate(inicioPagamento.getDate() + 30);
+      const fimPagamento = new Date(inicioPagamento);
+      fimPagamento.setDate(fimPagamento.getDate() + compra.prazo_pagamento);
+
+      const parcelas = calcularParcelas(compra).filter(p => p.entrega_num === index + 1);
+
+      return {
+        entrega_num: index + 1,
+        data_entrega: dataBase,
+        inicio_pagamento: inicioPagamento,
+        fim_pagamento: fimPagamento,
+        parcelas,
+      };
+    });
+
+    return {
+      compra_id: compra.id,
+      marca: compra.marca,
+      estacao: compra.estacao,
+      valor_total: compra.valor_total,
+      num_entregas: compra.num_entregas,
+      meses_prazo: mesesPrazo,
+      valor_por_entrega: valorPorEntrega,
+      valor_por_parcela: valorPorParcela,
+      entregas: entregasCalendario,
+    };
   };
 
   // Calcular fluxo de caixa mensal
@@ -259,7 +310,7 @@ export function useCompras(planejamentoId: string | null, custoFixoMensal: numbe
     compras.forEach(compra => {
       const parcelas = calcularParcelas(compra);
       parcelas.forEach(parcela => {
-        const mesData = fluxo.get(parcela.mes);
+        const mesData = fluxo.get(parcela.competencia_mes);
         if (mesData) {
           mesData.custo_compras += parcela.valor;
           mesData.total_saidas = mesData.custo_compras + mesData.custos_fixos;
@@ -367,6 +418,7 @@ export function useCompras(planejamentoId: string | null, custoFixoMensal: numbe
     updateCompra,
     removeCompra,
     calcularParcelas,
+    calcularCalendario,
     calcularFluxoCaixa,
     calcularResumoExecutivo,
     getCustoRealMensal,

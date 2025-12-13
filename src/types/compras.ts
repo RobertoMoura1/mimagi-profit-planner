@@ -22,9 +22,30 @@ export interface ParcelaCalculada {
   estacao: string;
   entrega_num: number;
   parcela_num: number;
-  data_vencimento: Date;
+  data_referencia: '01' | '15'; // dia do mês da parcela
+  competencia_mes: string; // formato "YYYY-MM"
   valor: number;
-  mes: string; // formato "YYYY-MM"
+  inicio_entrega: Date;
+  fim_entrega: Date;
+}
+
+// Interface para calendário de pagamentos (agrupado por compra)
+export interface CalendarioCompra {
+  compra_id: string;
+  marca: string;
+  estacao: string;
+  valor_total: number;
+  num_entregas: number;
+  meses_prazo: number;
+  valor_por_entrega: number;
+  valor_por_parcela: number;
+  entregas: {
+    entrega_num: number;
+    data_entrega: Date;
+    inicio_pagamento: Date;
+    fim_pagamento: Date;
+    parcelas: ParcelaCalculada[];
+  }[];
 }
 
 // Interface para fluxo de caixa mensal
