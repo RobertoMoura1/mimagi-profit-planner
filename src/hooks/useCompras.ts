@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Compra, ParcelaCalculada, FluxoCaixaMensal, ResumoExecutivo, CalendarioCompra } from '@/types/compras';
+import { Compra, CategoriaCompra, ParcelaCalculada, FluxoCaixaMensal, ResumoExecutivo, CalendarioCompra } from '@/types/compras';
 import { toast } from '@/hooks/use-toast';
 
 export function useCompras(planejamentoId: string | null, custoFixoMensal: number, margem: number, faturamentoMensal: number) {
@@ -36,6 +36,7 @@ export function useCompras(planejamentoId: string | null, custoFixoMensal: numbe
           planejamento_id: c.planejamento_id || undefined,
           estacao: c.estacao,
           marca: c.marca,
+          categoria: (c.categoria as CategoriaCompra) || 'menina',
           valor_total: Number(c.valor_total) || 0,
           prazo_pagamento: c.prazo_pagamento || 180,
           num_entregas: c.num_entregas || 1,
@@ -82,6 +83,7 @@ export function useCompras(planejamentoId: string | null, custoFixoMensal: numbe
           planejamento_id: data.planejamento_id || undefined,
           estacao: data.estacao,
           marca: data.marca,
+          categoria: (data.categoria as CategoriaCompra) || 'menina',
           valor_total: Number(data.valor_total) || 0,
           prazo_pagamento: data.prazo_pagamento || 180,
           num_entregas: data.num_entregas || 1,

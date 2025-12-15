@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { SectionCard } from '../SectionCard';
-import { Compra, defaultCompra, CalendarioCompra } from '@/types/compras';
+import { Compra, defaultCompra, CalendarioCompra, CategoriaCompra, CATEGORIAS_LABELS } from '@/types/compras';
 import { formatCurrency } from '@/utils/formatters';
 import { Plus, Trash2, Package, Calendar, Eye, Truck, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -127,7 +127,24 @@ export function ComprasPagamentos({ compras, saving, addCompra, updateCompra, re
                 onChange={(e) => setNovaCompra(prev => ({ ...prev, marca: e.target.value }))}
               />
             </div>
-            
+
+            <div>
+              <label className="corporate-label">Categoria</label>
+              <Select
+                value={novaCompra.categoria}
+                onValueChange={(v) => setNovaCompra(prev => ({ ...prev, categoria: v as CategoriaCompra }))}
+              >
+                <SelectTrigger className="rounded-none">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(CATEGORIAS_LABELS).map(([value, label]) => (
+                    <SelectItem key={value} value={value}>{label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             <div>
               <label className="corporate-label">Valor Total (R$)</label>
               <input
@@ -258,9 +275,9 @@ export function ComprasPagamentos({ compras, saving, addCompra, updateCompra, re
               <tr>
                 <th>Estação</th>
                 <th>Marca</th>
+                <th>Categoria</th>
                 <th>Valor Total</th>
                 <th>Entregas</th>
-                <th>Valor/Entrega</th>
                 <th>Valor/Parcela</th>
                 <th>Datas Entrega</th>
                 <th className="w-24">Ações</th>
@@ -277,9 +294,11 @@ export function ComprasPagamentos({ compras, saving, addCompra, updateCompra, re
                   <tr key={compra.id}>
                     <td className="font-medium">{compra.estacao}</td>
                     <td>{compra.marca}</td>
+                    <td>
+                      <span className="badge-primary">{CATEGORIAS_LABELS[compra.categoria]}</span>
+                    </td>
                     <td className="font-mono">{formatCurrency(compra.valor_total)}</td>
                     <td className="text-center">{compra.num_entregas}</td>
-                    <td className="font-mono text-muted-foreground">{formatCurrency(info.valorPorEntrega)}</td>
                     <td className="font-mono text-accent">{formatCurrency(info.valorPorParcela)}</td>
                     <td className="text-sm">
                       {datas.map((d, i) => (
