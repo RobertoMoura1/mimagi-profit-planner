@@ -1,9 +1,13 @@
+// Tipo de categoria/público-alvo
+export type CategoriaCompra = 'menina' | 'menino' | 'bebe' | 'sapatos';
+
 // Interface para compra/pedido
 export interface Compra {
   id: string;
   planejamento_id?: string;
   estacao: string;
   marca: string;
+  categoria: CategoriaCompra; // menina, menino, bebe, sapatos
   valor_total: number;
   prazo_pagamento: number; // dias (default 180)
   num_entregas: number; // 1 a 4
@@ -72,6 +76,7 @@ export interface ResumoExecutivo {
 export const defaultCompra: Omit<Compra, 'id'> = {
   estacao: '',
   marca: '',
+  categoria: 'menina',
   valor_total: 0,
   prazo_pagamento: 180,
   num_entregas: 1,
@@ -79,4 +84,11 @@ export const defaultCompra: Omit<Compra, 'id'> = {
   data_entrega_2: null,
   data_entrega_3: null,
   data_entrega_4: null,
+};
+
+export const CATEGORIAS_LABELS: Record<CategoriaCompra, string> = {
+  menina: 'Menina',
+  menino: 'Menino',
+  bebe: 'Bebê',
+  sapatos: 'Sapatos',
 };

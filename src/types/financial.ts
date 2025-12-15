@@ -211,6 +211,7 @@ export interface SimulationValues {
 export interface Alert {
   type: 'danger' | 'warning' | 'info';
   message: string;
+  active?: boolean;
 }
 
 export const defaultPlanejamento: PlanejamentoFinanceiro = {

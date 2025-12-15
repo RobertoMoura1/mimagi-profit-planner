@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       compras: {
         Row: {
+          categoria: string | null
           created_at: string
           data_entrega_1: string | null
           data_entrega_2: string | null
@@ -31,6 +32,7 @@ export type Database = {
           valor_total: number
         }
         Insert: {
+          categoria?: string | null
           created_at?: string
           data_entrega_1?: string | null
           data_entrega_2?: string | null
@@ -46,6 +48,7 @@ export type Database = {
           valor_total?: number
         }
         Update: {
+          categoria?: string | null
           created_at?: string
           data_entrega_1?: string | null
           data_entrega_2?: string | null
