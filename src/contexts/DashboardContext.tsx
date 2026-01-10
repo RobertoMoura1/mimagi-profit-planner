@@ -1,6 +1,7 @@
 import { createContext, useContext, ReactNode } from 'react';
 import { usePlanejamento } from '@/hooks/usePlanejamento';
 import { useCompras } from '@/hooks/useCompras';
+import { useAuthContext } from '@/contexts/AuthContext';
 import { PlanejamentoFinanceiro, CalculatedValues, Alert, SimulationValues } from '@/types/financial';
 import { Compra, FluxoCaixaMensal, ResumoExecutivo, CalendarioCompra } from '@/types/compras';
 
@@ -30,6 +31,9 @@ interface DashboardContextType {
 const DashboardContext = createContext<DashboardContextType | null>(null);
 
 export function DashboardProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuthContext();
+  const userId = user?.id ?? null;
+
   const { 
     data, 
     calculated, 
@@ -39,7 +43,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     updateField, 
     calculateSimulation, 
     recordId 
-  } = usePlanejamento();
+  } = usePlanejamento(userId);
   
   const { 
     compras, 
@@ -52,7 +56,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     calcularFluxoCaixa,
     calcularResumoExecutivo,
     getTotalComprometido,
-  } = useCompras(recordId, calculated.custo_fixo_mensal, data.margem, calculated.faturamento_mensal);
+  } = useCompras(recordId, calculated.custo_fixo_mensal, data.margem, calculated.faturamento_mensal, userId);
 
   const loading = planejamentoLoading || comprasLoading;
   const saving = planejamentoSaving || comprasSaving;
