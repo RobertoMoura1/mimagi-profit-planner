@@ -29,6 +29,7 @@ export type Database = {
           planejamento_id: string | null
           prazo_pagamento: number
           updated_at: string
+          user_id: string | null
           valor_total: number
         }
         Insert: {
@@ -45,6 +46,7 @@ export type Database = {
           planejamento_id?: string | null
           prazo_pagamento?: number
           updated_at?: string
+          user_id?: string | null
           valor_total?: number
         }
         Update: {
@@ -61,6 +63,7 @@ export type Database = {
           planejamento_id?: string | null
           prazo_pagamento?: number
           updated_at?: string
+          user_id?: string | null
           valor_total?: number
         }
         Relationships: [
@@ -169,6 +172,7 @@ export type Database = {
           tm_menina: number | null
           tm_menino: number | null
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           canais_venda?: Json | null
@@ -265,6 +269,7 @@ export type Database = {
           tm_menina?: number | null
           tm_menino?: number | null
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           canais_venda?: Json | null
@@ -361,6 +366,43 @@ export type Database = {
           tm_menina?: number | null
           tm_menino?: number | null
           updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string
+          faturamento_atual: number | null
+          id: string
+          instagram_loja: string | null
+          nome: string
+          nome_loja: string | null
+          updated_at: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          faturamento_atual?: number | null
+          id: string
+          instagram_loja?: string | null
+          nome: string
+          nome_loja?: string | null
+          updated_at?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          faturamento_atual?: number | null
+          id?: string
+          instagram_loja?: string | null
+          nome?: string
+          nome_loja?: string | null
+          updated_at?: string | null
+          whatsapp?: string | null
         }
         Relationships: []
       }

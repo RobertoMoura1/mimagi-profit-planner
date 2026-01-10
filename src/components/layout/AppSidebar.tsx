@@ -8,7 +8,9 @@ import {
   BarChart3,
   PlayCircle,
   Store,
-  Eye
+  Eye,
+  LogOut,
+  User
 } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import {
@@ -24,6 +26,16 @@ import {
   SidebarFooter,
   useSidebar,
 } from '@/components/ui/sidebar';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const menuItems = [
   { title: 'Variáveis', path: '/variaveis', icon: LayoutDashboard },
@@ -40,7 +52,12 @@ const menuItems = [
 
 export function AppSidebar() {
   const { state } = useSidebar();
+  const { profile, signOut } = useAuthContext();
   const isCollapsed = state === 'collapsed';
+
+  const handleLogout = async () => {
+    await signOut();
+  };
 
   return (
     <Sidebar collapsible="icon" className="border-r border-sidebar-border">
@@ -89,10 +106,47 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="p-4 border-t border-sidebar-border">
-        {!isCollapsed && (
-          <p className="text-xs text-sidebar-foreground/40 text-center">
-            © {new Date().getFullYear()} Mimagi
-          </p>
+        {!isCollapsed ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="w-full justify-start gap-3 h-auto py-3 px-3">
+                <div className="w-8 h-8 bg-sidebar-primary/20 rounded-full flex items-center justify-center shrink-0">
+                  <User className="w-4 h-4 text-sidebar-primary" />
+                </div>
+                <div className="flex flex-col items-start text-left overflow-hidden">
+                  <span className="text-sm font-medium truncate w-full text-sidebar-foreground">
+                    {profile?.nome || 'Usuário'}
+                  </span>
+                  <span className="text-xs text-sidebar-foreground/60 truncate w-full flex items-center gap-1">
+                    <Store className="w-3 h-3" />
+                    {profile?.nome_loja || 'Minha Loja'}
+                  </span>
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56">
+              <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-muted-foreground">
+                <User className="w-4 h-4 mr-2" />
+                {profile?.email}
+              </DropdownMenuItem>
+              {profile?.instagram_loja && (
+                <DropdownMenuItem className="text-muted-foreground">
+                  @{profile.instagram_loja.replace('@', '')}
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
+                <LogOut className="w-4 h-4 mr-2" />
+                Sair
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <Button variant="ghost" size="icon" onClick={handleLogout} className="w-full">
+            <LogOut className="w-5 h-5 text-sidebar-foreground/60" />
+          </Button>
         )}
       </SidebarFooter>
     </Sidebar>

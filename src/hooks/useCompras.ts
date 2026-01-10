@@ -3,22 +3,28 @@ import { supabase } from '@/integrations/supabase/client';
 import { Compra, CategoriaCompra, ParcelaCalculada, FluxoCaixaMensal, ResumoExecutivo, CalendarioCompra } from '@/types/compras';
 import { toast } from '@/hooks/use-toast';
 
-export function useCompras(planejamentoId: string | null, custoFixoMensal: number, margem: number, faturamentoMensal: number) {
+export function useCompras(
+  planejamentoId: string | null, 
+  custoFixoMensal: number, 
+  margem: number, 
+  faturamentoMensal: number,
+  userId: string | null
+) {
   const [compras, setCompras] = useState<Compra[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   // Carregar compras
   useEffect(() => {
-    if (planejamentoId) {
+    if (planejamentoId && userId) {
       loadCompras();
     } else {
       setLoading(false);
     }
-  }, [planejamentoId]);
+  }, [planejamentoId, userId]);
 
   const loadCompras = async () => {
-    if (!planejamentoId) return;
+    if (!planejamentoId || !userId) return;
     
     try {
       setLoading(true);
@@ -26,6 +32,7 @@ export function useCompras(planejamentoId: string | null, custoFixoMensal: numbe
         .from('compras')
         .select('*')
         .eq('planejamento_id', planejamentoId)
+        .eq('user_id', userId)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
@@ -62,7 +69,7 @@ export function useCompras(planejamentoId: string | null, custoFixoMensal: numbe
 
   // Adicionar compra
   const addCompra = useCallback(async (compra: Omit<Compra, 'id'>) => {
-    if (!planejamentoId) return;
+    if (!planejamentoId || !userId) return;
     
     try {
       setSaving(true);
@@ -71,6 +78,7 @@ export function useCompras(planejamentoId: string | null, custoFixoMensal: numbe
         .insert({
           ...compra,
           planejamento_id: planejamentoId,
+          user_id: userId,
         })
         .select()
         .single();

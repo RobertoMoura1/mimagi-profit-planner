@@ -1,15 +1,16 @@
 import { ReactNode } from 'react';
 import { SidebarProvider, SidebarTrigger, SidebarInset } from '@/components/ui/sidebar';
 import { AppSidebar } from './AppSidebar';
+import { useDashboardContext } from '@/contexts/DashboardContext';
 import { Loader2 } from 'lucide-react';
 
 interface Props {
   children: ReactNode;
-  saving?: boolean;
-  loading?: boolean;
 }
 
-export function DashboardLayout({ children, saving, loading }: Props) {
+export function DashboardLayout({ children }: Props) {
+  const { loading, saving } = useDashboardContext();
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">

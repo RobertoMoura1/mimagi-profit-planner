@@ -3,17 +3,21 @@ import { supabase } from '@/integrations/supabase/client';
 import { PlanejamentoFinanceiro, CalculatedValues, SimulationValues, Alert, defaultPlanejamento, CanalVenda, CustoExtra } from '@/types/financial';
 import { toast } from '@/hooks/use-toast';
 
-export function usePlanejamento() {
+export function usePlanejamento(userId: string | null) {
   const [data, setData] = useState<PlanejamentoFinanceiro>(defaultPlanejamento);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [recordId, setRecordId] = useState<string | null>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Carregar último registro
+  // Carregar último registro do usuário
   useEffect(() => {
-    loadData();
-  }, []);
+    if (userId) {
+      loadData();
+    } else {
+      setLoading(false);
+    }
+  }, [userId]);
 
   const parseCanaisVenda = (jsonData: unknown): CanalVenda[] => {
     if (!jsonData || !Array.isArray(jsonData)) {
@@ -44,11 +48,14 @@ export function usePlanejamento() {
   };
 
   const loadData = async () => {
+    if (!userId) return;
+    
     try {
       setLoading(true);
       const { data: records, error } = await supabase
         .from('planejamentos_financeiros')
         .select('*')
+        .eq('user_id', userId)
         .order('updated_at', { ascending: false })
         .limit(1);
 
@@ -172,6 +179,8 @@ export function usePlanejamento() {
   };
 
   const saveData = useCallback(async (newData: PlanejamentoFinanceiro) => {
+    if (!userId) return;
+    
     try {
       setSaving(true);
       
@@ -180,6 +189,7 @@ export function usePlanejamento() {
         ...newData,
         canais_venda: JSON.parse(JSON.stringify(newData.canais_venda)),
         custos_extras: JSON.parse(JSON.stringify(newData.custos_extras)),
+        user_id: userId,
       };
       
       if (recordId) {
@@ -211,7 +221,7 @@ export function usePlanejamento() {
     } finally {
       setSaving(false);
     }
-  }, [recordId]);
+  }, [recordId, userId]);
 
   // Autosave com delay de 2s
   const updateField = useCallback(<K extends keyof PlanejamentoFinanceiro>(
