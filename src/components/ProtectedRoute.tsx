@@ -1,15 +1,20 @@
 import { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { useUserRole } from '@/hooks/useUserRole';
 import { Loader2 } from 'lucide-react';
 
 interface Props {
   children: ReactNode;
+  requireAdmin?: boolean;
 }
 
-export function ProtectedRoute({ children }: Props) {
-  const { isAuthenticated, loading } = useAuthContext();
+export function ProtectedRoute({ children, requireAdmin = false }: Props) {
+  const { isAuthenticated, loading: authLoading } = useAuthContext();
+  const { isAdmin, isApproved, loading: roleLoading } = useUserRole();
   const location = useLocation();
+
+  const loading = authLoading || roleLoading;
 
   if (loading) {
     return (
@@ -24,6 +29,16 @@ export function ProtectedRoute({ children }: Props) {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // Admin route check
+  if (requireAdmin && !isAdmin) {
+    return <Navigate to="/variaveis" replace />;
+  }
+
+  // Regular user approval check (skip for admin routes)
+  if (!requireAdmin && !isApproved) {
+    return <Navigate to="/aguardando-aprovacao" replace />;
   }
 
   return <>{children}</>;

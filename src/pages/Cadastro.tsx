@@ -80,7 +80,7 @@ export default function Cadastro() {
     setIsLoading(false);
 
     if (result.success) {
-      navigate('/variaveis', { replace: true });
+      navigate('/aguardando-aprovacao', { replace: true });
     }
   };
 

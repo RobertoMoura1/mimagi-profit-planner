@@ -9,6 +9,8 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Login from "./pages/Login";
 import Cadastro from "./pages/Cadastro";
+import AguardandoAprovacao from "./pages/AguardandoAprovacao";
+import Admin from "./pages/Admin";
 import Variaveis from "./pages/Variaveis";
 import Distribuicao from "./pages/Distribuicao";
 import Produtos from "./pages/Produtos";
@@ -55,6 +57,19 @@ const App = () => (
             {/* Public routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/cadastro" element={<Cadastro />} />
+            
+            {/* Pending approval route */}
+            <Route path="/aguardando-aprovacao" element={<AguardandoAprovacao />} />
+            
+            {/* Admin route */}
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <Admin />
+                </ProtectedRoute>
+              }
+            />
             
             {/* Protected routes */}
             <Route
